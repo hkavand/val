@@ -14,12 +14,20 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
+        @font-face {
+            font-family: 'MyCustomFont';
+            src: url('ywh.otf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+
         body {
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'MyCustomFont', serif;
             background: #0a0a0c;
             overflow: hidden;
             color: var(--text);
@@ -61,7 +69,7 @@
         }
 
         h2 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'MyCustomFont', serif;
             font-size: 1.6rem;
             margin-bottom: 20px;
             line-height: 1.3;
@@ -134,7 +142,8 @@
         }
 
         .heart {
-            position: absolute;
+            position: fixed;
+            top: 0;
             pointer-events: none;
             z-index: 1000;
             animation: fall 3.5s linear forwards;
@@ -164,24 +173,31 @@
 
     <script>
         const questions = [
-            { q: "Where was the first place we felt a spark?", a: "any" },
-            { q: "What is the one song that reminds you of us?", a: "any" },
-            { q: "If we could fly anywhere tonight, where would it be?", a: "any" },
-            { q: "Are you ready for your surprise?", a: "any" }
+            { q: "Look who's here. Oh that's right I can't see 😬. I have a feeling who you are, but tell me your name 😊", a: "sadena" },
+            { q: "Oh wait, Is that really you sadena? hmm I have to be sure, tell me your last name: ", a: "valipour" },
+            { q: "It surrely can't be a coincidence, right? When is your birthday? (It was also your phones pin code right? 😉)", a: "840430" },
+            { q: "OMG, Ok I'm almost sure but what's behind this, is a bit personal. So I have to really really make sure, I dont want anybody else to see it other than you. Soooooo, what is my nickname for you?", a: "babygirl" }
         ];
 
         const messages = [
-            { title: "You Made It!", text: "Every answer you gave reminds me of why I'm so lucky to have you. But there's more I want to say..." },
-            { title: "Since We Met...", text: "My world has become a more beautiful place because of you. You're my favorite thought and my best friend." },
-            { title: "Our Memories", text: "I wanted to share some of my favorite moments of us. Keep clicking to see..." }
+            { title: "IT IS REALLY YOU! 😍", text: "What you just witnessed was the stages of my heart these past 7 months.😊From dark blue to burning red. You transformed me in the most important way possible and I wouldn't take back even one moment of it." },
+            { title: "A Fortress And Then YOU ... 😊", text: "My heart used to be a fortress, a fortress nobody was allowed in. Not even myself sometimes. But then came you... It was as if you had the keys to my fortress all along, heck it felt like you owned the keys. ☺️" },
+            { title: "Caught Off Guard ...", text: "You were the most unexpected surprise I could think of, it was so unexpected and pleasant it caught me off guard, and before I knew it, there I was, completely out and mesmerized by you. " },
+            { title: "I Surprised Even Myself", text: "Yeap, I was surprised to feel so connected with you, to feel so much at home when I was with you, when I was talking to you. I was surprised to see how much I could care for someone other than my family. But there was no denying it ... 😊"},
+            { title: "I Began to See Something", text: "Little by little, I began to see this completely different side of me. The side of me that could LOVE and also ACCEPT LOVE without being ashamed of it. The side that YOU brought up from deep inside me and I wanted to thank you for that. 🙏🏻❤️"},
+            { title: "Our Time Together", text: "Since we met, I've been enjoying every moment of it spent with you, and I don't think it's gonna change anytime soon. 😊 I've enjoyed talking with you, I've enjoyed looking at you and your eyes. I've enjoyed listening to you. I've enjoyed smelling your hair 😅. I've enjoyed kissing you, 😘 touching you 👋 and all that in between 😉. BUT most of all I've enjoyed just being with you and I want you to know that I don't take this for granted. 😊❤️"},
+            { title: "My Feelings", text: "The feeling that I currently have towards you, is the closest feeling to LOVE that I have ever experienced or could even think of. You redefined what I thought of love when I saw it in movies. I never would've guessed it would be this amazing. ☺️ I do LOVE you Sadena ❤️‍🔥"},
+            { title: "Forever And Always", text: "You deserve a lot more than this, and I hope I can give it to you. HAPPY VALENTINES BABYGIRL 😘"}
         ];
 
         // Replace these with your actual image URLs
         const images = [
-            "https://via.placeholder.com/300x300?text=Us+1",
-            "https://via.placeholder.com/300x300?text=Us+2",
-            "https://via.placeholder.com/300x300?text=Us+3",
-            "https://via.placeholder.com/300x300?text=Us+4"
+            "images/PIC1.jpg",
+            "images/PIC2.jpg",
+            "images/PIC3.jpg",
+            "images/PIC4.jpg",
+            "images/PIC5.jpg",
+            "images/PIC6.jpg",
         ];
 
         const stages_backup = [
@@ -191,66 +207,96 @@
             { bg: "#2b0000", b1: "#ff0844", b2: "#ffb199", accent: "#ff4d6d" }
         ];
 
+        
         const stages = [
             { bg: "#141e30", b1: "#243b55", b2: "#3a6186", accent: "#74ebd5" },
+            { bg: "#0f0c29", b1: "#302b63", b2: "#24243e", accent: "#74ebd5" },
             { bg: "#2d142c", b1: "#801336", b2: "#c72c41", accent: "#ff4d6d" },
-            { bg: "#2b0000", b1: "#ff0844", b2: "#ffb199", accent: "#ff4d6d" },
             { bg: "#4a0e0e", b1: "#941b0c", b2: "#d00000", accent: "#ff0000" },
         ];
+
 
         let currentStep = 0;
         let currentMsg = 0;
         let isCongrats = false;
         let showGallery = false;
+        let isCorrect = true;
 
         function updateUI() {
-            const content = document.getElementById('content');
-            const b1 = document.getElementById('b1');
-            const b2 = document.getElementById('b2');
-            
-            content.classList.remove('fade');
-            void content.offsetWidth;
-            content.classList.add('fade');
+            if (isCorrect){
+                const content = document.getElementById('content');
+                const b1 = document.getElementById('b1');
+                const b2 = document.getElementById('b2');
+                
+                content.classList.remove('fade');
+                void content.offsetWidth;
+                content.classList.add('fade');
 
-            if (!isCongrats) {
-                const s = stages[currentStep] || stages[3];
+                if (!isCongrats) {
+                    const s = stages[currentStep] || stages[3];
+                    document.body.style.background = s.bg;
+                    b1.style.background = s.b1; b2.style.background = s.b2;
+                    content.innerHTML = `
+                        <h2>${questions[currentStep].q}</h2>
+                        <div class="input-container"><input type="text" id="ans" placeholder="Answer..." autocomplete="off"></div>
+                        <button onclick="check()">Continue</button>
+                    `;
+                    document.getElementById('ans').focus();
+                    document.getElementById('ans').addEventListener("keypress", (e) => { if (e.key === "Enter") check(); });
+                } else if (!showGallery) {
+                    document.body.classList.add('congrats-state');
+                    document.body.style.background = "radial-gradient(circle, #fff0f3 0%, #ffc1cc 100%)";
+                    const m = messages[currentMsg];
+                    content.innerHTML = `
+                        <h2>${m.title}</h2>
+                        <p class="letter-text">${m.text}</p>
+                        <button onclick="nextMessage()">Read More</button>
+                    `;
+                } else {
+                    content.innerHTML = `
+                        <h2>TO US 🥳</h2>
+                        <p class="letter-text" style="margin-bottom:10px;">These are only some of the moments I cherish dearly. 😍</p>
+                        <div class="gallery-grid">
+                            ${images.map((src, i) => `<img src="${src}" class="gallery-img" style="--r:${(i % 2 === 0 ? '-3deg' : '3deg')}">`).join('')}
+                        </div>
+                        <button onclick="location.reload()" style="margin-top:20px;">Restart Journey ❤️</button>
+                    `;
+                }
+
+            } else {
+
+                const content = document.getElementById('content');
+                const b1 = document.getElementById('b1');
+                const b2 = document.getElementById('b2');
+                
+                content.classList.remove('fade');
+                void content.offsetWidth;
+                content.classList.add('fade');
+
+                const s = stages[0];
                 document.body.style.background = s.bg;
                 b1.style.background = s.b1; b2.style.background = s.b2;
                 content.innerHTML = `
-                    <h2>${questions[currentStep].q}</h2>
-                    <div class="input-container"><input type="text" id="ans" placeholder="Answer..." autocomplete="off"></div>
-                    <button onclick="check()">Continue</button>
+                    <h2>Sorry this website is not intended for you. 😐</h2>
+                    <button onclick="location.reload()">Restart</button>
                 `;
-                document.getElementById('ans').focus();
-                document.getElementById('ans').addEventListener("keypress", (e) => { if (e.key === "Enter") check(); });
-            } else if (!showGallery) {
-                document.body.classList.add('congrats-state');
-                document.body.style.background = "radial-gradient(circle, #fff0f3 0%, #ffc1cc 100%)";
-                const m = messages[currentMsg];
-                content.innerHTML = `
-                    <h2>${m.title}</h2>
-                    <p class="letter-text">${m.text}</p>
-                    <button onclick="nextMessage()">Read More</button>
-                `;
-            } else {
-                content.innerHTML = `
-                    <h2>Forever & Always</h2>
-                    <p class="letter-text" style="margin-bottom:10px;">Happy Valentine's Day! Here is to us.</p>
-                    <div class="gallery-grid">
-                        ${images.map((src, i) => `<img src="${src}" class="gallery-img" style="--r:${(i % 2 === 0 ? '-3deg' : '3deg')}">`).join('')}
-                    </div>
-                    <button onclick="location.reload()" style="margin-top:20px;">Restart Journey ❤️</button>
-                `;
+
+
             }
+            
         }
 
         function check() {
-            if (document.getElementById('ans').value.trim() !== "") {
+            const answer = document.getElementById('ans').value.trim().toLowerCase()
+            if (answer !== "" && answer == questions[currentStep].a) {
                 currentStep++;
                 if (currentStep >= questions.length) {
                     isCongrats = true;
-                    setInterval(createHeart, 250);
+                    setInterval(createHeart, 200);
                 }
+                updateUI();
+            } else if (answer !== ""){
+                isCorrect = false
                 updateUI();
             }
         }
@@ -266,10 +312,10 @@
 
         function createHeart() {
             const heart = document.createElement('div');
-            heart.innerHTML = ['❤️', '💖', '✨'][Math.floor(Math.random() * 3)];
+            heart.innerHTML = ['❤️', '💖', '✨', '💝', '🎉', '🥳', '💗', '💓'][Math.floor(Math.random() * 8)];
             heart.className = 'heart';
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.fontSize = (Math.random() * 20 + 20) + "px";
+            heart.style.fontSize = (Math.random() * 30 + 30) + "px";
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 3500);
         }
